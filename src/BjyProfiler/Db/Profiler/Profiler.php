@@ -113,9 +113,13 @@ class Profiler implements ProfilerInterface
         return true;
     }
 
-    public function getQueryProfiles($queryTypes = null)
+    public function getQueryProfiles($queryTypes = null, $sortDesc = true)
     {
         $profiles = array();
+
+        if ($sortDesc) {
+          $this->sortProfiles();
+        }
 
         if (count($this->profiles)) {
             foreach ($this->profiles as $id => $profile) {
@@ -130,6 +134,16 @@ class Profiler implements ProfilerInterface
         }
 
         return $profiles;
+    }
+
+    protected function sortProfiles()
+    {
+        usort($this->profiles, [$this, "cmp"]);
+    }
+
+    function cmp($queryA, $queryB)
+    {
+        return ($queryB->getElapsedTime() > $queryA->getElapsedTime());
     }
 
     public function profilerStart($target)
